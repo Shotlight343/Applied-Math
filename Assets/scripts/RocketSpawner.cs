@@ -10,7 +10,7 @@ public class RocketSpawner : MonoBehaviour
   
     [SerializeField] private GameObject rocketPrefab;
     
-    [SerializeField] private int rocketCount = 0;
+    [SerializeField] private int rocketCount = 1;
     [SerializeField] private int maxRocketCount = 8;
     [SerializeField] private float rocketSpeed = 8f;
     [SerializeField] private float rocketLifetime = 5f;
@@ -34,7 +34,7 @@ public class RocketSpawner : MonoBehaviour
     private void Update()
     {
     
-        if (rocketCount <= 0) return;
+        
 
         timer += Time.deltaTime;
         if (timer >= fireInterval)
@@ -50,7 +50,7 @@ public class RocketSpawner : MonoBehaviour
 
         Vector3 origin = player.position;
         float spacing = 360f / rocketCount;
-        float firstOffset = spacing / 2f; // half-spacing offset (matches the 4-rocket / 45deg example)
+        float firstOffset = spacing / 2f; 
 
         for (int i = 0; i < rocketCount; i++)
         {
@@ -67,11 +67,10 @@ public class RocketSpawner : MonoBehaviour
         }
     }
 
-    /// <summary>Called by PowerUp.cs on pickup. Increases rocketCount, capped at maxRocketCount.</summary>
     public void IncreaseRocketCount()
     {
         if (rocketCount < maxRocketCount)
             rocketCount++;
-        // Pickup beyond cap: no effect -- rocketCount simply stays at maxRocketCount.
+        
     }
 }
