@@ -1,24 +1,22 @@
 using UnityEngine;
 
-
 [RequireComponent(typeof(LineRenderer))]
 public class FlameTurret : MonoBehaviour
 {
-
-    [SerializeField] private string playerTag = "Player";
+    
+    [SerializeField] private string creatureTag = "Creature";
     [SerializeField] private float range = 8f;
 
-    
     [SerializeField] private Color outlineColor = Color.red;
     [SerializeField] private float outlineWidth = 0.05f;
     [SerializeField] private int arcSegments = 32;
 
     
-    [SerializeField] private float coneAngle = 40f; 
-    [SerializeField] private GameObject flameVisual; 
-    [SerializeField] private float damageTickRate = 0.25f; 
+    [SerializeField] private float coneAngle = 40f;
+    [SerializeField] private GameObject flameVisual;
+    [SerializeField] private float damageTickRate = 0.25f;
+    [SerializeField] private int damagePerTick = 1;
 
-    private Transform player;
     private LineRenderer lineRenderer;
     private float tickTimer;
 
@@ -30,9 +28,6 @@ public class FlameTurret : MonoBehaviour
         lineRenderer.endWidth = outlineWidth;
         lineRenderer.startColor = outlineColor;
         lineRenderer.endColor = outlineColor;
-
-        GameObject playerObj = GameObject.FindGameObjectWithTag(playerTag);
-        if (playerObj != null) player = playerObj.transform;
     }
 
     private void Start()
@@ -42,9 +37,8 @@ public class FlameTurret : MonoBehaviour
 
     private void Update()
     {
-        if (player == null) return;
-
-        bool detected = IsPlayerDetected();
+        Transform target = FindNearestCreature();
+        bool detected = target != null && IsDetected(target);
 
         if (flameVisual != null) flameVisual.SetActive(detected);
 
@@ -58,29 +52,33 @@ public class FlameTurret : MonoBehaviour
         if (tickTimer <= 0f)
         {
             tickTimer = damageTickRate;
-            PlayerHealth health = player.GetComponent<PlayerHealth>();
-            if (health != null) health.Hit();
+            Creature creature = target.GetComponent<Creature>();
+            if (creature != null) creature.TakeDamage(damagePerTick);
         }
     }
 
-    private bool IsPlayerDetected()
+    private bool IsDetected(Transform target)
     {
-        if (DistanceToPlayer() > range) return false;
-        return AngleToPlayer() <= coneAngle / 2f;
-    }
+        if (Vector3.Distance(transform.position, target.position) > range) return false;
 
-    private float AngleToPlayer()
-    {
-        Vector3 dir = player.position - transform.position;
+        Vector3 dir = target.position - transform.position;
         dir.y = 0f;
         Vector3 forward = transform.forward;
         forward.y = 0f;
-        return Vector3.Angle(forward, dir);
+        return Vector3.Angle(forward, dir) <= coneAngle / 2f;
     }
 
-    private float DistanceToPlayer()
+    private Transform FindNearestCreature()
     {
-        return Vector3.Distance(transform.position, player.position);
+        GameObject[] creatures = GameObject.FindGameObjectsWithTag(creatureTag);
+        Transform nearest = null;
+        float nearestDist = Mathf.Infinity;
+        foreach (GameObject c in creatures)
+        {
+            float d = Vector3.Distance(transform.position, c.transform.position);
+            if (d < nearestDist) { nearestDist = d; nearest = c.transform; }
+        }
+        return nearest;
     }
 
     private void DrawRangeShape()
@@ -89,14 +87,14 @@ public class FlameTurret : MonoBehaviour
         float halfAngle = coneAngle / 2f;
 
         Vector3[] points = new Vector3[arcSegments + 3];
-        points[0] = Vector3.zero; // turret origin
+        points[0] = Vector3.zero;
         for (int i = 0; i <= arcSegments; i++)
         {
             float t = (float)i / arcSegments;
             float currentAngle = -halfAngle + coneAngle * t;
             points[i + 1] = Quaternion.Euler(0, currentAngle, 0) * Vector3.forward * range;
         }
-        points[points.Length - 1] = Vector3.zero; // close the pie-slice back to the origin
+        points[points.Length - 1] = Vector3.zero;
 
         lineRenderer.positionCount = points.Length;
         lineRenderer.SetPositions(points);

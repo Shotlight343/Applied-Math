@@ -1,26 +1,26 @@
-using UnityEngine; 
-using System.Collections;
-
+using UnityEngine;
 
 [RequireComponent(typeof(LineRenderer))]
 public class SniperTurret : MonoBehaviour
 {
-    
-    [SerializeField] private string playerTag = "Player";
+
+    [SerializeField] private string creatureTag = "Creature";
     [SerializeField] private float range = 8f;
 
   
     [SerializeField] private Color outlineColor = Color.red;
     [SerializeField] private float outlineWidth = 0.05f;
 
-   
-    [SerializeField] private float sightAngleTolerance = 2f; 
+
+    [SerializeField] private float sightAngleTolerance = 2f;
     [SerializeField] private GameObject projectilePrefab;
-    [SerializeField] private Transform firePoint; 
-    [SerializeField] private float reloadTime = 2f; 
+    [SerializeField] private Transform firePoint;
+    [SerializeField] private float reloadTime = 2f;
     [SerializeField] private LayerMask obstacleMask;
 
-    private Transform player;
+  
+    [SerializeField] private float turnSpeed = 5f; 
+
     private LineRenderer lineRenderer;
     private bool wasDetected;
     private float reloadTimer;
@@ -33,9 +33,6 @@ public class SniperTurret : MonoBehaviour
         lineRenderer.endWidth = outlineWidth;
         lineRenderer.startColor = outlineColor;
         lineRenderer.endColor = outlineColor;
-
-        GameObject playerObj = GameObject.FindGameObjectWithTag(playerTag);
-        if (playerObj != null) player = playerObj.transform;
     }
 
     private void Start()
@@ -45,59 +42,71 @@ public class SniperTurret : MonoBehaviour
 
     private void Update()
     {
-        if (player == null) return;
+        Transform target = FindNearestCreature();
 
-        bool detected = IsPlayerDetected();
+        if (target != null) AimAt(target);
+
+        bool detected = target != null && IsDetected(target);
 
         if (reloadTimer > 0f) reloadTimer -= Time.deltaTime;
 
-        
         bool justEntered = detected && !wasDetected;
         bool canFireAgain = detected && reloadTimer <= 0f;
 
-        if (justEntered || canFireAgain)
+        if ((justEntered || canFireAgain) && target != null)
         {
-            Fire();
+            Fire(target);
             reloadTimer = reloadTime;
         }
 
         wasDetected = detected;
     }
 
-    private bool IsPlayerDetected()
+    private void AimAt(Transform target)
     {
-        if (DistanceToPlayer() > range) return false;
-        if (AngleToPlayer() > sightAngleTolerance) return false;
-
-        Vector3 origin = transform.position;
-        Vector3 dir = player.position - origin;
-        if (Physics.Raycast(origin, dir.normalized, out RaycastHit hit, range, obstacleMask))
-        {
-            return hit.collider.CompareTag(playerTag);
-        }
-        return true; 
+        Vector3 dir = target.position - transform.position;
+        float angle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, angle, 0), Time.deltaTime * turnSpeed);
     }
 
-    private float AngleToPlayer()
+    private bool IsDetected(Transform target)
     {
-        Vector3 dir = player.position - transform.position;
+        if (Vector3.Distance(transform.position, target.position) > range) return false;
+
+        Vector3 dir = target.position - transform.position;
         dir.y = 0f;
         Vector3 forward = transform.forward;
         forward.y = 0f;
-        return Vector3.Angle(forward, dir);
+        if (Vector3.Angle(forward, dir) > sightAngleTolerance) return false;
+
+        Vector3 origin = transform.position;
+        Vector3 rayDir = target.position - origin;
+        if (Physics.Raycast(origin, rayDir.normalized, out RaycastHit hit, range, obstacleMask))
+        {
+            return hit.collider.CompareTag(creatureTag);
+        }
+        return true;
     }
 
-    private float DistanceToPlayer()
+    private Transform FindNearestCreature()
     {
-        return Vector3.Distance(transform.position, player.position);
+        GameObject[] creatures = GameObject.FindGameObjectsWithTag(creatureTag);
+        Transform nearest = null;
+        float nearestDist = Mathf.Infinity;
+        foreach (GameObject c in creatures)
+        {
+            float d = Vector3.Distance(transform.position, c.transform.position);
+            if (d < nearestDist) { nearestDist = d; nearest = c.transform; }
+        }
+        return nearest;
     }
 
-    private void Fire()
+    private void Fire(Transform target)
     {
-        if (projectilePrefab == null || player == null) return;
+        if (projectilePrefab == null) return;
 
         Vector3 spawnPos = firePoint != null ? firePoint.position : transform.position;
-        Vector3 direction = (player.position - spawnPos).normalized;
+        Vector3 direction = (target.position - spawnPos).normalized;
 
         GameObject bullet = Instantiate(projectilePrefab, spawnPos, Quaternion.LookRotation(direction));
         Projectile proj = bullet.GetComponent<Projectile>();

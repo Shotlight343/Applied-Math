@@ -1,26 +1,24 @@
 using UnityEngine;
 
-
 [RequireComponent(typeof(LineRenderer))]
 public class ShotgunTurret : MonoBehaviour
 {
-
-    [SerializeField] private string playerTag = "Player";
+   
+    [SerializeField] private string creatureTag = "Creature";
     [SerializeField] private float range = 8f;
 
-
+    
     [SerializeField] private Color outlineColor = Color.red;
     [SerializeField] private float outlineWidth = 0.05f;
     [SerializeField] private int arcSegments = 32;
 
-
+   
     [SerializeField] private GameObject projectilePrefab;
     [SerializeField] private Transform firePoint;
     [SerializeField] private int pelletCount = 6;
-    [SerializeField] private float spreadAngle = 30f; // total spread the pellets fan across
+    [SerializeField] private float spreadAngle = 30f;
     [SerializeField] private float fireCooldown = 1.5f;
 
-    private Transform player;
     private LineRenderer lineRenderer;
     private float cooldownTimer;
 
@@ -32,9 +30,6 @@ public class ShotgunTurret : MonoBehaviour
         lineRenderer.endWidth = outlineWidth;
         lineRenderer.startColor = outlineColor;
         lineRenderer.endColor = outlineColor;
-
-        GameObject playerObj = GameObject.FindGameObjectWithTag(playerTag);
-        if (playerObj != null) player = playerObj.transform;
     }
 
     private void Start()
@@ -44,30 +39,37 @@ public class ShotgunTurret : MonoBehaviour
 
     private void Update()
     {
-        if (player == null) return;
-
-        bool detected = DistanceToPlayer() <= range; // full radius, no angle restriction
+        Transform target = FindNearestCreature();
+        bool detected = target != null && Vector3.Distance(transform.position, target.position) <= range;
 
         if (cooldownTimer > 0f) cooldownTimer -= Time.deltaTime;
 
         if (detected && cooldownTimer <= 0f)
         {
-            FireBlast();
+            FireBlast(target);
             cooldownTimer = fireCooldown;
         }
     }
 
-    private float DistanceToPlayer()
+    private Transform FindNearestCreature()
     {
-        return Vector3.Distance(transform.position, player.position);
+        GameObject[] creatures = GameObject.FindGameObjectsWithTag(creatureTag);
+        Transform nearest = null;
+        float nearestDist = Mathf.Infinity;
+        foreach (GameObject c in creatures)
+        {
+            float d = Vector3.Distance(transform.position, c.transform.position);
+            if (d < nearestDist) { nearestDist = d; nearest = c.transform; }
+        }
+        return nearest;
     }
 
-    private void FireBlast()
+    private void FireBlast(Transform target)
     {
-        if (projectilePrefab == null || player == null) return;
+        if (projectilePrefab == null) return;
 
         Vector3 spawnPos = firePoint != null ? firePoint.position : transform.position;
-        Vector3 baseDir = (player.position - spawnPos).normalized;
+        Vector3 baseDir = (target.position - spawnPos).normalized;
 
         float halfSpread = spreadAngle / 2f;
         for (int i = 0; i < pelletCount; i++)
