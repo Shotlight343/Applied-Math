@@ -253,10 +253,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e4acf1dfbdc206b4c91816bcfd2475ba, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShotgunTurret
-  playerTag: Player
-  range: 25
+  creatureTag: Creature
+  range: 30
   outlineColor: {r: 1, g: 0, b: 0, a: 1}
-  outlineWidth: 0.05
+  outlineWidth: 5.24
   arcSegments: 32
   projectilePrefab: {fileID: 4731041857881473931, guid: 1755c340f96260e49b499a09098b16d1, type: 3}
   firePoint: {fileID: 3254292407059849347}

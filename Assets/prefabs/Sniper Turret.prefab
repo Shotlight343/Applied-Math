@@ -157,7 +157,6 @@ GameObject:
   - component: {fileID: 530329973419948348}
   - component: {fileID: 8972168270474837085}
   - component: {fileID: 393847476882266746}
-  - component: {fileID: 7781964042878734886}
   - component: {fileID: 4808816847407696086}
   - component: {fileID: 6409327215951597439}
   m_Layer: 0
@@ -262,20 +261,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 1, y: 1, z: 1}
   m_Center: {x: 0, y: 0, z: 0}
---- !u!114 &7781964042878734886
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4890973714036607243}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2cc542a076d10a442bbf58d18b3eebed, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Rotator
-  target: {fileID: 296482094539563694, guid: 57f9c40eec78a73459f7327767095330, type: 3}
-  rotationSpeed: 5.48
 --- !u!120 &4808816847407696086
 LineRenderer:
   serializedVersion: 3
@@ -409,3 +394,4 @@ MonoBehaviour:
   obstacleMask:
     serializedVersion: 2
     m_Bits: 8
+  turnSpeed: 5

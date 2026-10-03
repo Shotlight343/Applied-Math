@@ -103,5 +103,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c92dab0395bbe744b9156cac46eed647, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Creature
-  maxHP: 5
+  maxHP: 1
   coinPrefab: {fileID: 3202555689347053088, guid: 960fb526ad06871499dfd45b792ea36b, type: 3}

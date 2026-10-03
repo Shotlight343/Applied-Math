@@ -127,7 +127,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Projectile
   speed: 200
   lifetime: 5
-  hitRadius: 1
+  hitRadius: 5
   damage: 1
   obstacleMask:
     serializedVersion: 2
