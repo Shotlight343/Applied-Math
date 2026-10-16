@@ -1,7 +1,7 @@
 using UnityEngine;
 
 [RequireComponent(typeof(LineRenderer))]
-public class ShotgunTurret : MonoBehaviour
+public class ShotgunTurret : MonoBehaviour, ILevelable
 {
    
     [SerializeField] private string creatureTag = "Creature";
@@ -15,12 +15,24 @@ public class ShotgunTurret : MonoBehaviour
    
     [SerializeField] private GameObject projectilePrefab;
     [SerializeField] private Transform firePoint;
-    [SerializeField] private int pelletCount = 6;
     [SerializeField] private float spreadAngle = 30f;
     [SerializeField] private float fireCooldown = 1.5f;
 
+    
+    [SerializeField] private int[] pelletsByLevel = { 5, 6, 9 };
+    [SerializeField] private int[] damageByLevel = { 1, 1, 2 }; 
+
     private LineRenderer lineRenderer;
     private float cooldownTimer;
+    private int level = 1;
+
+    private int CurrentPellets => pelletsByLevel[Mathf.Clamp(level - 1, 0, pelletsByLevel.Length - 1)];
+    private int CurrentDamage => damageByLevel[Mathf.Clamp(level - 1, 0, damageByLevel.Length - 1)];
+
+    public void ApplyLevel(int newLevel)
+    {
+        level = newLevel;
+    }
 
     private void Awake()
     {
@@ -71,16 +83,19 @@ public class ShotgunTurret : MonoBehaviour
         Vector3 spawnPos = firePoint != null ? firePoint.position : transform.position;
         Vector3 baseDir = (target.position - spawnPos).normalized;
 
+        int pelletCount = CurrentPellets;
+        int damage = CurrentDamage;
         float halfSpread = spreadAngle / 2f;
+
         for (int i = 0; i < pelletCount; i++)
         {
-            float t = pelletCount == 1 ? 0f : (float)i / (pelletCount - 1);
+            float t = pelletCount == 1 ? 0.5f : (float)i / (pelletCount - 1);
             float angle = -halfSpread + spreadAngle * t;
             Vector3 dir = Quaternion.Euler(0, angle, 0) * baseDir;
 
             GameObject pellet = Instantiate(projectilePrefab, spawnPos, Quaternion.LookRotation(dir));
             Projectile proj = pellet.GetComponent<Projectile>();
-            if (proj != null) proj.Launch(dir);
+            if (proj != null) proj.Launch(dir, damage);
         }
     }
 

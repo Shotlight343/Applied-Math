@@ -129,6 +129,7 @@ GameObject:
   - component: {fileID: 6723236168435283452}
   - component: {fileID: 3198806022462002816}
   - component: {fileID: 1304383286851425626}
+  - component: {fileID: -4425671914396063493}
   m_Layer: 0
   m_Name: Flame Turret
   m_TagString: Untagged
@@ -238,7 +239,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8162681109377128970}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2cc542a076d10a442bbf58d18b3eebed, type: 3}
   m_Name: 
@@ -367,14 +368,35 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 23caa8ee0d7b2b14ba37a83b1396293d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::FlameTurret
-  playerTag: Player
+  creatureTag: Creature
   range: 19.82
   outlineColor: {r: 1, g: 0, b: 0, a: 1}
   outlineWidth: 0.05
   arcSegments: 32
   coneAngle: 40
   flameVisual: {fileID: 3757487448426696699}
-  damageTickRate: 0.25
+  turnSpeed: 5
+  damagePerTickByLevel: 010000000100000002000000
+  tickRateByLevel:
+  - 0.5
+  - 0.4
+  - 0.25
+--- !u!114 &-4425671914396063493
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8162681109377128970}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 863feb865a37e9c43bb56a42ec44b73c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TurretUpgrade
+  turretName: Flame Turret
+  startLevel: 0
+  levelCosts: 0a0000003200000064000000
+  labelOffset: {x: 0, y: 3, z: 0}
 --- !u!1001 &8470513807212530800
 PrefabInstance:
   m_ObjectHideFlags: 0

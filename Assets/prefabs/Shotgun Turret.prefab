@@ -15,6 +15,7 @@ GameObject:
   - component: {fileID: 6745572095052966132}
   - component: {fileID: 5137086222041084499}
   - component: {fileID: 2330466951409994606}
+  - component: {fileID: -8051287011876074091}
   m_Layer: 0
   m_Name: Shotgun Turret
   m_TagString: Untagged
@@ -124,7 +125,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1833515469248243690}
-  m_Enabled: 1
+  m_Enabled: 0
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 2cc542a076d10a442bbf58d18b3eebed, type: 3}
   m_Name: 
@@ -260,9 +261,26 @@ MonoBehaviour:
   arcSegments: 32
   projectilePrefab: {fileID: 4731041857881473931, guid: 1755c340f96260e49b499a09098b16d1, type: 3}
   firePoint: {fileID: 3254292407059849347}
-  pelletCount: 6
   spreadAngle: 30
   fireCooldown: 5
+  pelletsByLevel: 050000000600000009000000
+  damageByLevel: 010000000100000002000000
+--- !u!114 &-8051287011876074091
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1833515469248243690}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 863feb865a37e9c43bb56a42ec44b73c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::TurretUpgrade
+  turretName: Shotgun Turret
+  startLevel: 0
+  levelCosts: 0a0000003200000064000000
+  labelOffset: {x: 0, y: 3, z: 0}
 --- !u!1 &6516757144829168968
 GameObject:
   m_ObjectHideFlags: 0
