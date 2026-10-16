@@ -1,75 +1,135 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-// Tag this prefab "Creature". Moves purely via transform using Bezier lerp
-// (no physics, no NavMesh). Spawner calls Initialize() with 3 points
-// (quadratic) or 4 points (cubic).
+
 public class Creature : MonoBehaviour
 {
-    [SerializeField] private int maxHP = 5;
-    [SerializeField] private GameObject coinPrefab; // UI prefab with a Coin component
+    
+    public static int AliveCount { get; private set; }
+
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
+    private static void ResetStatics()
+    {
+        AliveCount = 0; 
+    }
+
+    [SerializeField] private GameObject coinPrefab;
+    [SerializeField] private float coinScatter = 40f; 
 
     private int currentHP;
-    private List<Vector3> points;
-    private float travelTime;
-    private float t;
+    private int coinMin;
+    private int coinMax;
+    private bool isDead;
+    private bool counted;
 
-    public void Initialize(List<Vector3> controlPoints, float travelDuration)
+    private List<Vector3> points;
+    private float moveSpeed;
+    private int segmentIndex;
+    private float segmentT;
+    private float segmentLength;
+
+    public void Initialize(List<Vector3> waypoints, float speed, int hp, int dropMin, int dropMax, Color tint)
     {
-        points = controlPoints;
-        travelTime = Mathf.Max(0.01f, travelDuration);
-        currentHP = maxHP;
-        t = 0f;
+        points = waypoints;
+        moveSpeed = Mathf.Max(0.01f, speed);
+        currentHP = hp;
+        coinMin = dropMin;
+        coinMax = Mathf.Max(dropMin, dropMax);
+        segmentIndex = 0;
+        segmentT = 0f;
         transform.position = points[0];
+        UpdateSegmentLength();
+
+        
+        if (tint.a > 0f)
+        {
+            Renderer r = GetComponentInChildren<Renderer>();
+            if (r != null) r.material.color = tint;
+        }
+
+        if (!counted)
+        {
+            counted = true;
+            AliveCount++;
+        }
+    }
+
+    private void OnDestroy()
+    {
+        if (counted) AliveCount--;
     }
 
     private void Update()
     {
-        if (points == null) return;
+        if (points == null || isDead) return;
 
-        t += Time.deltaTime / travelTime;
-        float clamped = Mathf.Clamp01(t);
+        segmentT += (moveSpeed * Time.deltaTime) / segmentLength;
 
-        transform.position = points.Count == 3
-            ? BezierUtility.QuadraticLerp(points[0], points[1], points[2], clamped)
-            : BezierUtility.CubicLerp(points[0], points[1], points[2], points[3], clamped);
+        
+        while (segmentT >= 1f)
+        {
+            segmentIndex++;
+            if (segmentIndex >= points.Count - 1)
+            {
+                transform.position = points[points.Count - 1];
+                ReachTarget();
+                return;
+            }
+            float overshoot = (segmentT - 1f) * segmentLength;
+            UpdateSegmentLength();
+            segmentT = overshoot / segmentLength;
+        }
 
-        if (t >= 1f) ReachTarget();
+        transform.position = Vector3.Lerp(points[segmentIndex], points[segmentIndex + 1], segmentT);
+    }
+
+    private void UpdateSegmentLength()
+    {
+        segmentLength = Mathf.Max(0.0001f, Vector3.Distance(points[segmentIndex], points[segmentIndex + 1]));
     }
 
     public void TakeDamage(int amount)
     {
+        if (isDead) return;     
+
         currentHP -= amount;
         if (currentHP <= 0) Die();
     }
 
     private void Die()
     {
-        SpawnCoin();
+        isDead = true;
+        SpawnCoins();
         Destroy(gameObject);
     }
 
     private void ReachTarget()
     {
+        isDead = true;
         if (GameManager.Instance != null) GameManager.Instance.DamagePlayer(1);
         Destroy(gameObject);
     }
 
-    private void SpawnCoin()
+    private void SpawnCoins()
     {
         if (coinPrefab == null || GameManager.Instance == null) return;
 
         RectTransform canvasRect = GameManager.Instance.UICanvasRect;
-        if (canvasRect == null) return;
+        if (canvasRect == null || Camera.main == null) return;
 
         Vector2 screenPoint = Camera.main.WorldToScreenPoint(transform.position);
-        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screenPoint, null, out Vector2 localPoint);
+        RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screenPoint, null, out Vector2 origin);
 
-        GameObject coinObj = Instantiate(coinPrefab, canvasRect);
-        RectTransform coinRect = coinObj.GetComponent<RectTransform>();
-        if (coinRect != null) coinRect.anchoredPosition = localPoint;
+        // Each kill drops a random number of coins from this wave's range, each worth 1
+        int count = Random.Range(coinMin, coinMax + 1);
+        for (int i = 0; i < count; i++)
+        {
+            GameObject coinObj = Instantiate(coinPrefab, canvasRect);
+            RectTransform coinRect = coinObj.GetComponent<RectTransform>();
+            if (coinRect != null) coinRect.anchoredPosition = origin + Random.insideUnitCircle * coinScatter;
 
-        Coin coin = coinObj.GetComponent<Coin>();
-        if (coin != null) coin.Init(GameManager.Instance.BankTargetRect, 1);
+            Coin coin = coinObj.GetComponent<Coin>();
+            if (coin != null) coin.Init(GameManager.Instance.BankTargetRect, 1);
+        }
     }
 }

@@ -1,14 +1,16 @@
 using UnityEngine;
-using TMPro;
+using UnityEngine.UI;
 using System.Collections;
+using TMPro;
 
-// Swap Text for TMP_Text if your project uses TextMeshPro.
+
 public class BankUI : MonoBehaviour
 {
     public static BankUI Instance { get; private set; }
 
     [SerializeField] private TMP_Text bankText;
-    [SerializeField] private RectTransform iconTransform; // punches on each deposit
+    [SerializeField] private RectTransform iconTransform; 
+    [SerializeField] private int startingCoins = 10;      
     [SerializeField] private float countDuration = 0.5f;
     [SerializeField] private float punchScale = 1.2f;
     [SerializeField] private float punchDuration = 0.15f;
@@ -18,9 +20,14 @@ public class BankUI : MonoBehaviour
     private Coroutine countRoutine;
     private Coroutine punchRoutine;
 
+    
+    public int Balance => targetTotal;
+
     private void Awake()
     {
         Instance = this;
+        displayedTotal = startingCoins;
+        targetTotal = startingCoins;
     }
 
     private void Start()
@@ -33,7 +40,7 @@ public class BankUI : MonoBehaviour
         targetTotal += amount;
 
         if (countRoutine != null) StopCoroutine(countRoutine);
-        countRoutine = StartCoroutine(CountUpRoutine());
+        countRoutine = StartCoroutine(CountRoutine());
 
         if (iconTransform != null)
         {
@@ -42,7 +49,20 @@ public class BankUI : MonoBehaviour
         }
     }
 
-    private IEnumerator CountUpRoutine()
+  
+    public bool TrySpend(int amount)
+    {
+        if (amount > targetTotal) return false;
+
+        targetTotal -= amount;
+
+        if (countRoutine != null) StopCoroutine(countRoutine);
+        countRoutine = StartCoroutine(CountRoutine());
+        return true;
+    }
+
+    
+    private IEnumerator CountRoutine()
     {
         int startValue = displayedTotal;
         float t = 0f;
@@ -50,7 +70,7 @@ public class BankUI : MonoBehaviour
         while (t < 1f)
         {
             t += Time.deltaTime / countDuration;
-            float eased = 1f - Mathf.Pow(1f - Mathf.Clamp01(t), 2f); // ease-out
+            float eased = 1f - Mathf.Pow(1f - Mathf.Clamp01(t), 2f);
             displayedTotal = Mathf.RoundToInt(Mathf.Lerp(startValue, targetTotal, eased));
             UpdateText(displayedTotal);
             yield return null;
@@ -68,7 +88,7 @@ public class BankUI : MonoBehaviour
         while (t < 1f)
         {
             t += Time.deltaTime / punchDuration;
-            float scale = Mathf.Lerp(punchScale, 1f, t); // overshoots then settles to 1
+            float scale = Mathf.Lerp(punchScale, 1f, t); 
             iconTransform.localScale = baseScale * scale;
             yield return null;
         }

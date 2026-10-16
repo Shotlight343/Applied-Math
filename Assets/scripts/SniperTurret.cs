@@ -1,29 +1,41 @@
 using UnityEngine;
 
 [RequireComponent(typeof(LineRenderer))]
-public class SniperTurret : MonoBehaviour
+public class SniperTurret : MonoBehaviour, ILevelable
 {
-
+   
     [SerializeField] private string creatureTag = "Creature";
     [SerializeField] private float range = 8f;
 
-  
+   
     [SerializeField] private Color outlineColor = Color.red;
     [SerializeField] private float outlineWidth = 0.05f;
 
-
+  
     [SerializeField] private float sightAngleTolerance = 2f;
     [SerializeField] private GameObject projectilePrefab;
     [SerializeField] private Transform firePoint;
-    [SerializeField] private float reloadTime = 2f;
     [SerializeField] private LayerMask obstacleMask;
 
   
     [SerializeField] private float turnSpeed = 5f; 
 
+    
+    [SerializeField] private int[] damageByLevel = { 2, 3, 5 };
+    [SerializeField] private float[] reloadByLevel = { 2f, 1.6f, 1f }; 
+
     private LineRenderer lineRenderer;
     private bool wasDetected;
     private float reloadTimer;
+    private int level = 1;
+
+    private int CurrentDamage => damageByLevel[Mathf.Clamp(level - 1, 0, damageByLevel.Length - 1)];
+    private float CurrentReload => reloadByLevel[Mathf.Clamp(level - 1, 0, reloadByLevel.Length - 1)];
+
+    public void ApplyLevel(int newLevel)
+    {
+        level = newLevel;
+    }
 
     private void Awake()
     {
@@ -56,7 +68,7 @@ public class SniperTurret : MonoBehaviour
         if ((justEntered || canFireAgain) && target != null)
         {
             Fire(target);
-            reloadTimer = reloadTime;
+            reloadTimer = CurrentReload;
         }
 
         wasDetected = detected;
@@ -110,7 +122,7 @@ public class SniperTurret : MonoBehaviour
 
         GameObject bullet = Instantiate(projectilePrefab, spawnPos, Quaternion.LookRotation(direction));
         Projectile proj = bullet.GetComponent<Projectile>();
-        if (proj != null) proj.Launch(direction);
+        if (proj != null) proj.Launch(direction, CurrentDamage);
     }
 
     private void DrawRangeShape()

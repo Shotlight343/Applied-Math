@@ -1,8 +1,6 @@
 using UnityEngine;
 
-// No Rigidbody, no Collider required on the projectile OR the creature:
-// moves via transform and checks for hits by measuring distance from
-// each tagged creature to the path it swept this frame.
+
 public class Projectile : MonoBehaviour
 {
     [SerializeField] private float speed = 20f;
@@ -26,6 +24,13 @@ public class Projectile : MonoBehaviour
         direction = dir.normalized;
     }
 
+   
+    public void Launch(Vector3 dir, int damageAmount)
+    {
+        damage = damageAmount;
+        Launch(dir);
+    }
+
     private void Update()
     {
         previousPosition = transform.position;
@@ -38,7 +43,7 @@ public class Projectile : MonoBehaviour
         Vector3 movement = transform.position - previousPosition;
         float distance = movement.magnitude;
 
-        
+      
         GameObject[] creatures = GameObject.FindGameObjectsWithTag(creatureTag);
         foreach (GameObject c in creatures)
         {
@@ -48,12 +53,10 @@ public class Projectile : MonoBehaviour
                 Creature creature = c.GetComponent<Creature>();
                 if (creature != null) creature.TakeDamage(damage);
                 Destroy(gameObject);
-                Debug.Log($"Projectile hit {c.name} for {damage} damage.");
                 return;
             }
         }
 
-        
         if (distance > 0f && Physics.SphereCast(previousPosition, hitRadius, movement.normalized, out RaycastHit hit, distance, obstacleMask))
         {
             Destroy(gameObject);
