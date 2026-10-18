@@ -385,7 +385,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SniperTurret
   creatureTag: Creature
-  range: 100
+  range: 200
   outlineColor: {r: 1, g: 0.903612, b: 0, a: 1}
   outlineWidth: 0.5
   sightAngleTolerance: 2

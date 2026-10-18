@@ -3,11 +3,11 @@ using UnityEngine;
 [RequireComponent(typeof(LineRenderer))]
 public class SniperTurret : MonoBehaviour, ILevelable
 {
-   
+
     [SerializeField] private string creatureTag = "Creature";
     [SerializeField] private float range = 8f;
 
-   
+    
     [SerializeField] private Color outlineColor = Color.red;
     [SerializeField] private float outlineWidth = 0.05f;
 
@@ -17,12 +17,12 @@ public class SniperTurret : MonoBehaviour, ILevelable
     [SerializeField] private Transform firePoint;
     [SerializeField] private LayerMask obstacleMask;
 
-  
+            
     [SerializeField] private float turnSpeed = 5f; 
 
     
     [SerializeField] private int[] damageByLevel = { 2, 3, 5 };
-    [SerializeField] private float[] reloadByLevel = { 2f, 1.6f, 1f }; 
+    [SerializeField] private float[] reloadByLevel = { 2f, 1.6f, 1f };
 
     private LineRenderer lineRenderer;
     private bool wasDetected;
@@ -45,11 +45,8 @@ public class SniperTurret : MonoBehaviour, ILevelable
         lineRenderer.endWidth = outlineWidth;
         lineRenderer.startColor = outlineColor;
         lineRenderer.endColor = outlineColor;
-    }
 
-    private void Start()
-    {
-        DrawRangeShape();
+        DrawRangeShape(); 
     }
 
     private void Update()

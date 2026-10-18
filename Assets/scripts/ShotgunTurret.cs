@@ -18,7 +18,7 @@ public class ShotgunTurret : MonoBehaviour, ILevelable
     [SerializeField] private float spreadAngle = 30f;
     [SerializeField] private float fireCooldown = 1.5f;
 
-    
+  
     [SerializeField] private int[] pelletsByLevel = { 5, 6, 9 };
     [SerializeField] private int[] damageByLevel = { 1, 1, 2 }; 
 
@@ -42,11 +42,8 @@ public class ShotgunTurret : MonoBehaviour, ILevelable
         lineRenderer.endWidth = outlineWidth;
         lineRenderer.startColor = outlineColor;
         lineRenderer.endColor = outlineColor;
-    }
 
-    private void Start()
-    {
-        DrawRangeShape();
+        DrawRangeShape(); 
     }
 
     private void Update()
