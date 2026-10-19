@@ -3421,7 +3421,7 @@ MonoBehaviour:
   elite:
     name: Elite Cubey
     prefab: {fileID: 5513082322569785665, guid: e524ceb28c3074942827af5ced5f16b0, type: 3}
-    hp: 30
+    hp: 35
     speed: 1.5
     scale: 1.5
     tint: {r: 0.45, g: 0.1, b: 0.65, a: 1}
