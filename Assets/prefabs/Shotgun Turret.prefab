@@ -285,7 +285,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TurretUpgrade
   turretName: Shotgun Turret
   startLevel: 0
-  levelCosts: 0a0000003200000064000000
+  levelCosts: 140000005000000078000000
   sellRefundPercent: 50
   labelOffset: {x: 0, y: 3, z: 0}
 --- !u!1 &2359126182381147746

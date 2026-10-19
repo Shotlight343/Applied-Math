@@ -23,7 +23,7 @@ public class SniperTurret : MonoBehaviour, ILevelable
    
     [SerializeField] private float turnSpeed = 5f;
 
-    [Header("Levels (element 0 = Level 1, element 2 = Level 3 / max)")]
+   
     [SerializeField] private int[] damageByLevel = { 2, 3, 5 };
     [SerializeField] private float[] reloadByLevel = { 2f, 1.6f, 1f }; 
 

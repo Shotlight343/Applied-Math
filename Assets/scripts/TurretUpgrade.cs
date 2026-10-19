@@ -107,6 +107,7 @@ public class TurretUpgrade : MonoBehaviour
     {
         int refund = SellValue;
         if (refund > 0 && BankUI.Instance != null) BankUI.Instance.AddCoins(refund);
+        SfxManager.Sell();
 
         Destroy(gameObject);
     }

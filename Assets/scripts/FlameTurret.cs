@@ -3,26 +3,25 @@ using UnityEngine;
 [RequireComponent(typeof(LineRenderer))]
 public class FlameTurret : MonoBehaviour, ILevelable
 {
-
+   
     [SerializeField] private string creatureTag = "Creature";
     [SerializeField] private float range = 8f;
 
-   
+ 
     [SerializeField] private Color outlineColor = Color.red;
     [SerializeField] private float outlineWidth = 0.05f;
     [SerializeField] private int arcSegments = 32;
 
-
+   
     [SerializeField] private float coneAngle = 40f;
     [SerializeField] private GameObject flameVisual;
 
-
+   
     [SerializeField] private float turnSpeed = 5f; 
 
 
     [SerializeField] private SfxSound flameLoopSound = new SfxSound(); 
-
-
+    [Header("Levels (element 0 = Level 1, element 2 = Level 3 / max)")]
     [SerializeField] private int[] damagePerTickByLevel = { 1, 1, 2 };
     [SerializeField] private float[] tickRateByLevel = { 0.5f, 0.4f, 0.25f }; 
 
@@ -51,7 +50,7 @@ public class FlameTurret : MonoBehaviour, ILevelable
 
         DrawRangeShape(); 
 
-       
+      
         flameSource = gameObject.AddComponent<AudioSource>();
         flameSource.playOnAwake = false;
         flameSource.loop = true;
@@ -63,7 +62,7 @@ public class FlameTurret : MonoBehaviour, ILevelable
     {
         GameObject[] creatures = GameObject.FindGameObjectsWithTag(creatureTag);
 
-      
+        
         Transform nearest = null;
         float nearestDist = Mathf.Infinity;
         foreach (GameObject c in creatures)
@@ -93,7 +92,7 @@ public class FlameTurret : MonoBehaviour, ILevelable
         if (flameVisual != null) flameVisual.SetActive(anyInCone);
         SetFlameSound(anyInCone);
 
-       
+        
         if (tickDue) tickTimer = anyInCone ? CurrentTickRate : 0f;
     }
 
@@ -102,10 +101,14 @@ public class FlameTurret : MonoBehaviour, ILevelable
         SetFlameSound(false); 
     }
 
-
+    
     private void SetFlameSound(bool on)
     {
-        if (flameSource == null || flameLoopSound.clip == null || on == flameSoundOn) return;
+        if (flameSource == null || flameLoopSound.clip == null) return;
+
+      
+        if (flameSoundOn) flameSource.volume = flameLoopSound.volume * SfxManager.MasterVolume;
+        if (on == flameSoundOn) return;
 
         flameSoundOn = on;
         if (on)

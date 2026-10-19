@@ -6,29 +6,30 @@ using System.Collections.Generic;
 public class EnemyTypeData
 {
     public string name = "Cubey";
-    public GameObject prefab;                          
+    public GameObject prefab;                        
     public int hp = 4;
-    public float speed = 3f;                           
+    public float speed = 3f;                          
     public float scale = 1f;
-    public Color tint = new Color(0f, 0f, 0f, 0f);     
+    public Color tint = new Color(0f, 0f, 0f, 0f);    
 }
 
 
 public class WaveManager : MonoBehaviour
 {
-   
+    [Header("Spawner")]
     [SerializeField] private CreatureSpawner spawner;
 
-  
+    [Header("Enemy types")]
     [SerializeField] private EnemyTypeData basic = new EnemyTypeData { name = "Basic Cubey", hp = 4, speed = 3f };
     [SerializeField] private EnemyTypeData elite = new EnemyTypeData { name = "Elite Cubey", hp = 8, speed = 1.5f, scale = 1.5f, tint = new Color(0.45f, 0.1f, 0.65f, 1f) };
     [SerializeField] private EnemyTypeData speedy = new EnemyTypeData { name = "Speedy Cubey", hp = 2, speed = 6f, scale = 0.7f, tint = new Color(1f, 0.85f, 0.1f, 1f) };
 
-       [SerializeField] private float firstWaveDelay = 5f;
+    [Header("Timing")]
+    [SerializeField] private float firstWaveDelay = 5f;
     [SerializeField] private float timeBetweenWaves = 8f;
     [SerializeField] private float spawnInterval = 0.8f;
 
-   
+
     private static readonly int[][] WaveCounts =
     {
         new[] { 5, 0, 0 },
@@ -43,7 +44,7 @@ public class WaveManager : MonoBehaviour
         new[] { 20, 10, 10 },
     };
 
-    private int currentWave;   
+    private int currentWave;  
     private float countdown;   
     private GUIStyle labelStyle;
 
@@ -65,7 +66,7 @@ public class WaveManager : MonoBehaviour
             currentWave = w + 1;
             List<EnemyTypeData> queue = BuildQueue(WaveCounts[w]);
 
-            
+           
             int coinMin = currentWave;
             int coinMax = currentWave * 2;
 
@@ -76,12 +77,14 @@ public class WaveManager : MonoBehaviour
                 yield return new WaitForSeconds(spawnInterval);
             }
 
-            
+         
             while (Creature.AliveCount > 0)
             {
                 if (GameOver) yield break;
                 yield return null;
             }
+
+            SfxManager.WaveWin(); 
 
             if (w < WaveCounts.Length - 1) yield return StartCoroutine(Countdown(timeBetweenWaves));
         }
@@ -108,7 +111,7 @@ public class WaveManager : MonoBehaviour
         for (int i = 0; i < counts[1]; i++) queue.Add(elite);
         for (int i = 0; i < counts[2]; i++) queue.Add(speedy);
 
-        
+    
         for (int i = queue.Count - 1; i > 0; i--)
         {
             int j = Random.Range(0, i + 1);

@@ -18,9 +18,13 @@ public class PauseMenu : MonoBehaviour
     private const float ButtonGap = 14f;
     private const float TitleHeight = 70f;
 
+    private bool showOptions;      
+    private bool sliderChanged;    
+
     private GUIStyle titleStyle;
     private GUIStyle buttonStyle;
     private GUIStyle hintStyle;
+    private GUIStyle hintStyleLeft;
 
     private void OnGUI()
     {
@@ -33,7 +37,7 @@ public class PauseMenu : MonoBehaviour
         {
             if (IsPaused)
             {
-                Resume();
+                if (showOptions) showOptions = false; 
                 e.Use();
             }
             else if (!TurretShop.IsPlacing) 
@@ -54,6 +58,7 @@ public class PauseMenu : MonoBehaviour
     private void Pause()
     {
         IsPaused = true;
+        showOptions = false;
         Time.timeScale = 0f;
         AudioListener.pause = true;
     }
@@ -74,25 +79,31 @@ public class PauseMenu : MonoBehaviour
             return;
         }
 
-        Resume(); 
+        Resume();
         SceneManager.LoadScene(scene.buildIndex);
     }
 
     private void Quit()
     {
-        Resume(); 
-        SceneManager.LoadScene("MainMenu"); 
-       
+       Resume();
+       SceneManager.LoadScene("MainMenu");
+        Debug.Log("Quit pressed - nothing happens until a main menu exists.");
     }
 
     private void DrawMenu()
     {
-        
+        // Dim the game behind the menu
         GUI.color = new Color(0f, 0f, 0f, 0.6f);
         GUI.DrawTexture(new Rect(0f, 0f, Screen.width, Screen.height), Texture2D.whiteTexture);
         GUI.color = Color.white;
 
-        float panelHeight = TitleHeight + 3f * ButtonHeight + 2f * ButtonGap + 50f;
+        if (showOptions)
+        {
+            DrawOptions();
+            return;
+        }
+
+        float panelHeight = TitleHeight + 4f * ButtonHeight + 3f * ButtonGap + 50f;
         Rect panel = new Rect((Screen.width - PanelWidth) / 2f, (Screen.height - panelHeight) / 2f, PanelWidth, panelHeight);
         GUI.Box(panel, GUIContent.none);
 
@@ -104,6 +115,9 @@ public class PauseMenu : MonoBehaviour
         if (MenuButton(new Rect(x, y, ButtonWidth, ButtonHeight), "Resume")) Resume();
         y += ButtonHeight + ButtonGap;
 
+        if (MenuButton(new Rect(x, y, ButtonWidth, ButtonHeight), "Options")) showOptions = true;
+        y += ButtonHeight + ButtonGap;
+
         if (MenuButton(new Rect(x, y, ButtonWidth, ButtonHeight), "Restart")) Restart();
         y += ButtonHeight + ButtonGap;
 
@@ -112,7 +126,46 @@ public class PauseMenu : MonoBehaviour
         GUI.Label(new Rect(panel.x, panel.yMax - 34f, panel.width, 24f), "Esc to resume", hintStyle);
     }
 
-    
+    private void DrawOptions()
+    {
+       
+        bool mouseReleased = Event.current.type == EventType.MouseUp;
+
+        float panelHeight = TitleHeight + 2f * 74f + ButtonHeight + 50f;
+        Rect panel = new Rect((Screen.width - PanelWidth) / 2f, (Screen.height - panelHeight) / 2f, PanelWidth, panelHeight);
+        GUI.Box(panel, GUIContent.none);
+
+        GUI.Label(new Rect(panel.x, panel.y + 10f, panel.width, TitleHeight - 10f), "OPTIONS", titleStyle);
+
+        float x = panel.x + (PanelWidth - ButtonWidth) / 2f;
+        float y = panel.y + TitleHeight;
+
+        SfxManager.MusicVolume = VolumeSlider(new Rect(x, y, ButtonWidth, 60f), "Music", SfxManager.MusicVolume);
+        y += 74f;
+        SfxManager.SfxVolume = VolumeSlider(new Rect(x, y, ButtonWidth, 60f), "Sound effects", SfxManager.SfxVolume);
+        y += 74f;
+
+        if (MenuButton(new Rect(x, y, ButtonWidth, ButtonHeight), "Back")) showOptions = false;
+
+   
+        if (mouseReleased && sliderChanged)
+        {
+            sliderChanged = false;
+            SfxManager.Click();
+        }
+    }
+
+   
+    private float VolumeSlider(Rect rect, string label, float value)
+    {
+        GUI.Label(new Rect(rect.x, rect.y, rect.width, 28f), $"{label}: {Mathf.RoundToInt(value * 100f)}%", hintStyleLeft);
+
+        float newValue = GUI.HorizontalSlider(new Rect(rect.x, rect.y + 36f, rect.width, 20f), value, 0f, 1f);
+        if (!Mathf.Approximately(newValue, value)) sliderChanged = true;
+        return newValue;
+    }
+
+    // A button that plays the click sound when pressed
     private bool MenuButton(Rect rect, string label)
     {
         if (!GUI.Button(rect, label, buttonStyle)) return false;
@@ -130,5 +183,8 @@ public class PauseMenu : MonoBehaviour
 
         hintStyle = new GUIStyle(GUI.skin.label) { fontSize = 14, alignment = TextAnchor.MiddleCenter };
         hintStyle.normal.textColor = new Color(1f, 1f, 1f, 0.7f);
+
+        hintStyleLeft = new GUIStyle(GUI.skin.label) { fontSize = 20, alignment = TextAnchor.MiddleLeft };
+        hintStyleLeft.normal.textColor = Color.white;
     }
 }

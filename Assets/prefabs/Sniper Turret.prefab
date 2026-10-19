@@ -396,12 +396,12 @@ MonoBehaviour:
     m_Bits: 8
   shootSound:
     clip: {fileID: 8300000, guid: e9696f05640732142b74d2e3d2189cbc, type: 3}
-    volume: 1
+    volume: 0.675
   turnSpeed: 5
-  damageByLevel: 020000000300000005000000
+  damageByLevel: 05000000070000000a000000
   reloadByLevel:
+  - 3.5
   - 2
-  - 1.6
   - 1
 --- !u!114 &6867592437434554504
 MonoBehaviour:
@@ -417,6 +417,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::TurretUpgrade
   turretName: Sniper Turret
   startLevel: 0
-  levelCosts: 0a0000003200000064000000
+  levelCosts: 1e0000005a00000082000000
   sellRefundPercent: 50
   labelOffset: {x: 0, y: 3, z: 0}
