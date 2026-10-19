@@ -80,14 +80,14 @@ public class PauseMenu : MonoBehaviour
 
     private void Quit()
     {
-        Resume();
-        SceneManager.LoadScene("MainMenu");
-        Debug.Log("Quit pressed - nothing happens until a main menu exists.");
+        Resume(); 
+        SceneManager.LoadScene("MainMenu"); 
+       
     }
 
     private void DrawMenu()
     {
-        // Dim the game behind the menu
+        
         GUI.color = new Color(0f, 0f, 0f, 0.6f);
         GUI.DrawTexture(new Rect(0f, 0f, Screen.width, Screen.height), Texture2D.whiteTexture);
         GUI.color = Color.white;
@@ -101,15 +101,24 @@ public class PauseMenu : MonoBehaviour
         float x = panel.x + (PanelWidth - ButtonWidth) / 2f;
         float y = panel.y + TitleHeight;
 
-        if (GUI.Button(new Rect(x, y, ButtonWidth, ButtonHeight), "Resume", buttonStyle)) Resume();
+        if (MenuButton(new Rect(x, y, ButtonWidth, ButtonHeight), "Resume")) Resume();
         y += ButtonHeight + ButtonGap;
 
-        if (GUI.Button(new Rect(x, y, ButtonWidth, ButtonHeight), "Restart", buttonStyle)) Restart();
+        if (MenuButton(new Rect(x, y, ButtonWidth, ButtonHeight), "Restart")) Restart();
         y += ButtonHeight + ButtonGap;
 
-        if (GUI.Button(new Rect(x, y, ButtonWidth, ButtonHeight), "Quit", buttonStyle)) Quit();
+        if (MenuButton(new Rect(x, y, ButtonWidth, ButtonHeight), "Quit")) Quit();
 
         GUI.Label(new Rect(panel.x, panel.yMax - 34f, panel.width, 24f), "Esc to resume", hintStyle);
+    }
+
+    
+    private bool MenuButton(Rect rect, string label)
+    {
+        if (!GUI.Button(rect, label, buttonStyle)) return false;
+
+        SfxManager.Click();
+        return true;
     }
 
     private void CreateStyles()

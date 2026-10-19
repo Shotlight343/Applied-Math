@@ -3,7 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(LineRenderer))]
 public class FlameTurret : MonoBehaviour, ILevelable
 {
-  
+
     [SerializeField] private string creatureTag = "Creature";
     [SerializeField] private float range = 8f;
 
@@ -12,18 +12,24 @@ public class FlameTurret : MonoBehaviour, ILevelable
     [SerializeField] private float outlineWidth = 0.05f;
     [SerializeField] private int arcSegments = 32;
 
+
     [SerializeField] private float coneAngle = 40f;
     [SerializeField] private GameObject flameVisual;
 
 
     [SerializeField] private float turnSpeed = 5f; 
 
-  
+
+    [SerializeField] private SfxSound flameLoopSound = new SfxSound(); 
+
+
     [SerializeField] private int[] damagePerTickByLevel = { 1, 1, 2 };
     [SerializeField] private float[] tickRateByLevel = { 0.5f, 0.4f, 0.25f }; 
 
     private LineRenderer lineRenderer;
     private float tickTimer;
+    private AudioSource flameSource;
+    private bool flameSoundOn;
     private int level = 1;
 
     private int CurrentDamage => damagePerTickByLevel[Mathf.Clamp(level - 1, 0, damagePerTickByLevel.Length - 1)];
@@ -43,14 +49,21 @@ public class FlameTurret : MonoBehaviour, ILevelable
         lineRenderer.startColor = outlineColor;
         lineRenderer.endColor = outlineColor;
 
-        DrawRangeShape();
+        DrawRangeShape(); 
+
+       
+        flameSource = gameObject.AddComponent<AudioSource>();
+        flameSource.playOnAwake = false;
+        flameSource.loop = true;
+        flameSource.spatialBlend = 0f; 
+        flameSource.clip = flameLoopSound.clip;
     }
 
     private void Update()
     {
         GameObject[] creatures = GameObject.FindGameObjectsWithTag(creatureTag);
 
-       
+      
         Transform nearest = null;
         float nearestDist = Mathf.Infinity;
         foreach (GameObject c in creatures)
@@ -60,6 +73,7 @@ public class FlameTurret : MonoBehaviour, ILevelable
         }
         if (nearest != null && nearestDist <= range) AimAt(nearest);
 
+        
         tickTimer -= Time.deltaTime;
         bool tickDue = tickTimer <= 0f;
         bool anyInCone = false;
@@ -77,9 +91,32 @@ public class FlameTurret : MonoBehaviour, ILevelable
         }
 
         if (flameVisual != null) flameVisual.SetActive(anyInCone);
+        SetFlameSound(anyInCone);
 
-        
+       
         if (tickDue) tickTimer = anyInCone ? CurrentTickRate : 0f;
+    }
+
+    private void OnDisable()
+    {
+        SetFlameSound(false); 
+    }
+
+
+    private void SetFlameSound(bool on)
+    {
+        if (flameSource == null || flameLoopSound.clip == null || on == flameSoundOn) return;
+
+        flameSoundOn = on;
+        if (on)
+        {
+            flameSource.volume = flameLoopSound.volume * SfxManager.MasterVolume;
+            flameSource.Play();
+        }
+        else
+        {
+            flameSource.Stop();
+        }
     }
 
     private void AimAt(Transform target)

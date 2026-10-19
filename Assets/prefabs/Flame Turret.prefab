@@ -376,6 +376,9 @@ MonoBehaviour:
   coneAngle: 40
   flameVisual: {fileID: 3757487448426696699}
   turnSpeed: 5
+  flameLoopSound:
+    clip: {fileID: 8300000, guid: 7b7cfd573961a1949adfa1beeab25037, type: 3}
+    volume: 1
   damagePerTickByLevel: 010000000100000002000000
   tickRateByLevel:
   - 0.5
@@ -396,6 +399,7 @@ MonoBehaviour:
   turretName: Flame Turret
   startLevel: 0
   levelCosts: 0a0000003200000064000000
+  sellRefundPercent: 50
   labelOffset: {x: 0, y: 3, z: 0}
 --- !u!1001 &8470513807212530800
 PrefabInstance:

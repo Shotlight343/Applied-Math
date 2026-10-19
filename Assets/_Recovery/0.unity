@@ -1861,7 +1861,6 @@ MonoBehaviour:
   - {fileID: 1833515469248243690, guid: e78020c956db63a42ba53769a0be828c, type: 3}
   placementY: 0.5
   minTurretSpacing: 2.5
-  mapBounds: {fileID: 0}
   validColor: {r: 0.2, g: 1, b: 0.3, a: 1}
   invalidColor: {r: 1, g: 0.2, b: 0.2, a: 1}
 --- !u!4 &1252076900
@@ -2132,6 +2131,63 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerHealth
   invulnerabilityDuration: 1
+--- !u!1 &1305817277
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1305817279}
+  - component: {fileID: 1305817278}
+  m_Layer: 0
+  m_Name: SfxManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1305817278
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1305817277}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5e21ec88f6ac058479a08f5b46536208, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SfxManager
+  masterVolume: 1
+  buttonClick:
+    clip: {fileID: 8300000, guid: 5d5a54eebd9fa214d97f862ad103ec71, type: 3}
+    volume: 1
+  buy:
+    clip: {fileID: 8300000, guid: 51b625d419ac8e6469b4c372287a88c7, type: 3}
+    volume: 1
+  sell:
+    clip: {fileID: 8300000, guid: 965e2e637b799aa458153c87eb83a6c5, type: 3}
+    volume: 1
+  build:
+    clip: {fileID: 8300000, guid: 39c4cf143f8e8a14a8d0293b61669ac6, type: 3}
+    volume: 1
+--- !u!4 &1305817279
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1305817277}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -20.29777, y: -0.00001, z: -51.20739}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1326049562
 GameObject:
   m_ObjectHideFlags: 0
@@ -3235,7 +3291,7 @@ MonoBehaviour:
     name: Basic Cubey
     prefab: {fileID: 244942076204411861, guid: 57f9c40eec78a73459f7327767095330, type: 3}
     hp: 4
-    speed: 99
+    speed: 3
     scale: 1
     tint: {r: 0, g: 0, b: 0, a: 0}
   elite:
@@ -3766,3 +3822,4 @@ SceneRoots:
   - {fileID: 1793948642}
   - {fileID: 1252076900}
   - {fileID: 1809464869}
+  - {fileID: 1305817279}

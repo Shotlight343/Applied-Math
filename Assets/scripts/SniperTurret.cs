@@ -3,26 +3,29 @@ using UnityEngine;
 [RequireComponent(typeof(LineRenderer))]
 public class SniperTurret : MonoBehaviour, ILevelable
 {
-
+   
     [SerializeField] private string creatureTag = "Creature";
     [SerializeField] private float range = 8f;
 
-    
+   
     [SerializeField] private Color outlineColor = Color.red;
     [SerializeField] private float outlineWidth = 0.05f;
 
-  
+    
     [SerializeField] private float sightAngleTolerance = 2f;
     [SerializeField] private GameObject projectilePrefab;
     [SerializeField] private Transform firePoint;
     [SerializeField] private LayerMask obstacleMask;
 
-            
-    [SerializeField] private float turnSpeed = 5f; 
+  
+    [SerializeField] private SfxSound shootSound = new SfxSound(); 
 
-    
+   
+    [SerializeField] private float turnSpeed = 5f;
+
+    [Header("Levels (element 0 = Level 1, element 2 = Level 3 / max)")]
     [SerializeField] private int[] damageByLevel = { 2, 3, 5 };
-    [SerializeField] private float[] reloadByLevel = { 2f, 1.6f, 1f };
+    [SerializeField] private float[] reloadByLevel = { 2f, 1.6f, 1f }; 
 
     private LineRenderer lineRenderer;
     private bool wasDetected;
@@ -120,6 +123,8 @@ public class SniperTurret : MonoBehaviour, ILevelable
         GameObject bullet = Instantiate(projectilePrefab, spawnPos, Quaternion.LookRotation(direction));
         Projectile proj = bullet.GetComponent<Projectile>();
         if (proj != null) proj.Launch(direction, CurrentDamage);
+
+        SfxManager.Play(shootSound);
     }
 
     private void DrawRangeShape()

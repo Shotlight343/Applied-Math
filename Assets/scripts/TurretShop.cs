@@ -9,8 +9,8 @@ public class TurretShop : MonoBehaviour
 
     [Header("Placement")]
     [SerializeField] private float placementY = 0.5f;        
-    [SerializeField] private float minTurretSpacing = 2.5f; 
-    [SerializeField] private Collider mapBounds;            
+    [SerializeField] private float minTurretSpacing = 2.5f;  
+      
 
     [Header("Preview outline colours")]
     [SerializeField] private Color validColor = new Color(0.2f, 1f, 0.3f, 1f);
@@ -27,7 +27,7 @@ public class TurretShop : MonoBehaviour
     private const float HeaderHeight = 30f;
     private const float Padding = 10f;
 
-   
+    
     public static bool IsPlacing { get; private set; }
 
     private readonly List<Entry> entries = new List<Entry>();
@@ -80,7 +80,7 @@ public class TurretShop : MonoBehaviour
         if (ghost != null) HandlePlacement();
     }
 
-
+  
 
     private Rect GetPanelRect()
     {
@@ -109,10 +109,11 @@ public class TurretShop : MonoBehaviour
             bool canAfford = BankUI.Instance != null && BankUI.Instance.Balance >= entry.info.BuildCost;
 
             GUI.color = isSelected ? new Color(0.6f, 1f, 0.6f, 1f) : Color.white;
-            GUI.enabled = canAfford || isSelected; 
+            GUI.enabled = canAfford || isSelected; // the selected one stays clickable so a second click cancels
 
             if (GUI.Button(rect, $"{entry.info.TurretName}\n{entry.info.BuildCost} coins", buttonStyle))
             {
+                SfxManager.Click();
                 if (isSelected) CancelPlacement();
                 else StartPlacement(entry);
             }
@@ -122,7 +123,6 @@ public class TurretShop : MonoBehaviour
         }
     }
 
-  
 
     private void StartPlacement(Entry entry)
     {
@@ -131,7 +131,7 @@ public class TurretShop : MonoBehaviour
         selectedPrefab = entry.prefab;
         selectedInfo = entry.info;
 
-   
+
         ghost = Instantiate(entry.prefab);
         foreach (MonoBehaviour mb in ghost.GetComponentsInChildren<MonoBehaviour>(true)) mb.enabled = false;
         foreach (Collider col in ghost.GetComponentsInChildren<Collider>(true)) col.enabled = false;
@@ -175,6 +175,7 @@ public class TurretShop : MonoBehaviour
         bool hasPoint = !overUI && TryGetGroundPoint(mouse, out point);
         string problem = hasPoint ? GetPlacementProblem(point) : null;
 
+    
         ghost.SetActive(hasPoint);
         if (hasPoint)
         {
@@ -206,21 +207,20 @@ public class TurretShop : MonoBehaviour
         GameObject turret = Instantiate(selectedPrefab, point, selectedPrefab.transform.rotation);
 
         TurretUpgrade upgrade = turret.GetComponentInChildren<TurretUpgrade>(true);
-        if (upgrade != null) upgrade.SetLevel(1); 
+        if (upgrade != null) upgrade.SetLevel(1);
+
+        SfxManager.Buy();   
+        SfxManager.Build(); 
 
         CancelPlacement();
     }
 
-
+    
     private string GetPlacementProblem(Vector3 point)
     {
         if (BankUI.Instance == null || BankUI.Instance.Balance < selectedInfo.BuildCost) return "Not enough coins";
 
-        if (mapBounds != null)
-        {
-            Bounds b = mapBounds.bounds;
-            if (point.x < b.min.x || point.x > b.max.x || point.z < b.min.z || point.z > b.max.z) return "Outside the map";
-        }
+       
 
         foreach (TurretUpgrade other in TurretUpgrade.All)
         {
@@ -244,6 +244,7 @@ public class TurretShop : MonoBehaviour
         return false;
     }
 
+  
     private bool TryGetGroundPoint(Vector2 guiPoint, out Vector3 point)
     {
         point = default;

@@ -7,18 +7,20 @@ public class ShotgunTurret : MonoBehaviour, ILevelable
     [SerializeField] private string creatureTag = "Creature";
     [SerializeField] private float range = 8f;
 
-    
     [SerializeField] private Color outlineColor = Color.red;
     [SerializeField] private float outlineWidth = 0.05f;
     [SerializeField] private int arcSegments = 32;
 
-   
+  
     [SerializeField] private GameObject projectilePrefab;
     [SerializeField] private Transform firePoint;
     [SerializeField] private float spreadAngle = 30f;
     [SerializeField] private float fireCooldown = 1.5f;
 
-  
+
+    [SerializeField] private SfxSound shootSound = new SfxSound(); 
+
+
     [SerializeField] private int[] pelletsByLevel = { 5, 6, 9 };
     [SerializeField] private int[] damageByLevel = { 1, 1, 2 }; 
 
@@ -79,6 +81,8 @@ public class ShotgunTurret : MonoBehaviour, ILevelable
 
         Vector3 spawnPos = firePoint != null ? firePoint.position : transform.position;
         Vector3 baseDir = (target.position - spawnPos).normalized;
+
+        SfxManager.Play(shootSound);
 
         int pelletCount = CurrentPellets;
         int damage = CurrentDamage;

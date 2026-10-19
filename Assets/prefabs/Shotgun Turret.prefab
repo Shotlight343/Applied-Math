@@ -266,6 +266,9 @@ MonoBehaviour:
   firePoint: {fileID: 3254292407059849347}
   spreadAngle: 30
   fireCooldown: 5
+  shootSound:
+    clip: {fileID: 8300000, guid: 9b97dba3a2c3f5e49a066c2444e29272, type: 3}
+    volume: 1
   pelletsByLevel: 050000000600000009000000
   damageByLevel: 010000000100000002000000
 --- !u!114 &-8051287011876074091
@@ -283,6 +286,7 @@ MonoBehaviour:
   turretName: Shotgun Turret
   startLevel: 0
   levelCosts: 0a0000003200000064000000
+  sellRefundPercent: 50
   labelOffset: {x: 0, y: 3, z: 0}
 --- !u!1 &2359126182381147746
 GameObject:

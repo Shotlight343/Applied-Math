@@ -394,6 +394,9 @@ MonoBehaviour:
   obstacleMask:
     serializedVersion: 2
     m_Bits: 8
+  shootSound:
+    clip: {fileID: 8300000, guid: e9696f05640732142b74d2e3d2189cbc, type: 3}
+    volume: 1
   turnSpeed: 5
   damageByLevel: 020000000300000005000000
   reloadByLevel:
@@ -415,4 +418,5 @@ MonoBehaviour:
   turretName: Sniper Turret
   startLevel: 0
   levelCosts: 0a0000003200000064000000
+  sellRefundPercent: 50
   labelOffset: {x: 0, y: 3, z: 0}
