@@ -371,7 +371,7 @@ MonoBehaviour:
   creatureTag: Creature
   range: 19.82
   outlineColor: {r: 1, g: 0, b: 0, a: 1}
-  outlineWidth: 0.05
+  outlineWidth: 2
   arcSegments: 32
   coneAngle: 40
   flameVisual: {fileID: 3757487448426696699}

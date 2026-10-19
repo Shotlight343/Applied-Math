@@ -260,7 +260,7 @@ MonoBehaviour:
   creatureTag: Creature
   range: 30
   outlineColor: {r: 1, g: 0, b: 0, a: 1}
-  outlineWidth: 5.24
+  outlineWidth: 3
   arcSegments: 32
   projectilePrefab: {fileID: 4731041857881473931, guid: 1755c340f96260e49b499a09098b16d1, type: 3}
   firePoint: {fileID: 3254292407059849347}

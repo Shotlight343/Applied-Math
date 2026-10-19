@@ -400,9 +400,9 @@ MonoBehaviour:
   turnSpeed: 5
   damageByLevel: 05000000070000000a000000
   reloadByLevel:
-  - 3.5
+  - 5
+  - 3
   - 2
-  - 1
 --- !u!114 &6867592437434554504
 MonoBehaviour:
   m_ObjectHideFlags: 0
