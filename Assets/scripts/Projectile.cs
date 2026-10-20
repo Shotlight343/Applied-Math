@@ -1,30 +1,31 @@
 using UnityEngine;
 
-
 public class Projectile : MonoBehaviour
 {
     [SerializeField] private float speed = 20f;
     [SerializeField] private float lifetime = 5f;
     [SerializeField] private float hitRadius = 0.2f;
     [SerializeField] private int damage = 1;
-    [SerializeField] private LayerMask obstacleMask; 
+    [SerializeField] private LayerMask obstacleMask;
     [SerializeField] private string creatureTag = "Creature";
 
     private Vector3 direction;
     private Vector3 previousPosition;
+    private float age;
 
-    private void Start()
+    private void OnEnable()
     {
+        age = 0f;
+        direction = Vector3.zero;
         previousPosition = transform.position;
-        Destroy(gameObject, lifetime);
     }
 
     public void Launch(Vector3 dir)
     {
         direction = dir.normalized;
+        previousPosition = transform.position;
     }
 
-   
     public void Launch(Vector3 dir, int damageAmount)
     {
         damage = damageAmount;
@@ -33,6 +34,13 @@ public class Projectile : MonoBehaviour
 
     private void Update()
     {
+        age += Time.deltaTime;
+        if (age >= lifetime)
+        {
+            ObjectPool.Release(gameObject);
+            return;
+        }
+
         previousPosition = transform.position;
         transform.position += direction * speed * Time.deltaTime;
         CheckForHit();
@@ -43,7 +51,6 @@ public class Projectile : MonoBehaviour
         Vector3 movement = transform.position - previousPosition;
         float distance = movement.magnitude;
 
-      
         GameObject[] creatures = GameObject.FindGameObjectsWithTag(creatureTag);
         foreach (GameObject c in creatures)
         {
@@ -52,14 +59,14 @@ public class Projectile : MonoBehaviour
             {
                 Creature creature = c.GetComponent<Creature>();
                 if (creature != null) creature.TakeDamage(damage);
-                Destroy(gameObject);
+                ObjectPool.Release(gameObject);
                 return;
             }
         }
 
         if (distance > 0f && Physics.SphereCast(previousPosition, hitRadius, movement.normalized, out RaycastHit hit, distance, obstacleMask))
         {
-            Destroy(gameObject);
+            ObjectPool.Release(gameObject);
         }
     }
 

@@ -1,26 +1,27 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-
 public class Creature : MonoBehaviour
 {
-    
+
     public static int AliveCount { get; private set; }
 
     [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.SubsystemRegistration)]
     private static void ResetStatics()
     {
-        AliveCount = 0; 
+        AliveCount = 0;
     }
 
     [SerializeField] private GameObject coinPrefab;
-    [SerializeField] private float coinScatter = 40f; 
+    [SerializeField] private float coinScatter = 40f;
 
     private int currentHP;
     private int coinMin;
     private int coinMax;
     private bool isDead;
     private bool counted;
+    private Renderer bodyRenderer;
+    private Color originalColor;
 
     private List<Vector3> points;
     private float moveSpeed;
@@ -28,8 +29,15 @@ public class Creature : MonoBehaviour
     private float segmentT;
     private float segmentLength;
 
+    private void Awake()
+    {
+        bodyRenderer = GetComponentInChildren<Renderer>();
+        if (bodyRenderer != null) originalColor = bodyRenderer.material.color;
+    }
+
     public void Initialize(List<Vector3> waypoints, float speed, int hp, int dropMin, int dropMax, Color tint)
     {
+        isDead = false;
         points = waypoints;
         moveSpeed = Mathf.Max(0.01f, speed);
         currentHP = hp;
@@ -40,12 +48,7 @@ public class Creature : MonoBehaviour
         transform.position = points[0];
         UpdateSegmentLength();
 
-        
-        if (tint.a > 0f)
-        {
-            Renderer r = GetComponentInChildren<Renderer>();
-            if (r != null) r.material.color = tint;
-        }
+        if (bodyRenderer != null) bodyRenderer.material.color = tint.a > 0f ? tint : originalColor;
 
         if (!counted)
         {
@@ -65,7 +68,6 @@ public class Creature : MonoBehaviour
 
         segmentT += (moveSpeed * Time.deltaTime) / segmentLength;
 
-        
         while (segmentT >= 1f)
         {
             segmentIndex++;
@@ -90,7 +92,7 @@ public class Creature : MonoBehaviour
 
     public void TakeDamage(int amount)
     {
-        if (isDead) return;     
+        if (isDead) return;
 
         currentHP -= amount;
         if (currentHP <= 0) Die();
@@ -100,14 +102,24 @@ public class Creature : MonoBehaviour
     {
         isDead = true;
         SpawnCoins();
-        Destroy(gameObject);
+        Despawn();
     }
 
     private void ReachTarget()
     {
         isDead = true;
         if (GameManager.Instance != null) GameManager.Instance.DamagePlayer(1);
-        Destroy(gameObject);
+        Despawn();
+    }
+
+    private void Despawn()
+    {
+        if (counted)
+        {
+            counted = false;
+            AliveCount--;
+        }
+        ObjectPool.Release(gameObject);
     }
 
     private void SpawnCoins()
@@ -120,7 +132,6 @@ public class Creature : MonoBehaviour
         Vector2 screenPoint = Camera.main.WorldToScreenPoint(transform.position);
         RectTransformUtility.ScreenPointToLocalPointInRectangle(canvasRect, screenPoint, null, out Vector2 origin);
 
-        // Each kill drops a random number of coins from this wave's range, each worth 1
         int count = Random.Range(coinMin, coinMax + 1);
         for (int i = 0; i < count; i++)
         {

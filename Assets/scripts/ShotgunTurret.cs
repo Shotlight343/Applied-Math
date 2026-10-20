@@ -3,7 +3,7 @@ using UnityEngine;
 [RequireComponent(typeof(LineRenderer))]
 public class ShotgunTurret : MonoBehaviour, ILevelable
 {
-   
+
     [SerializeField] private string creatureTag = "Creature";
     [SerializeField] private float range = 8f;
 
@@ -11,18 +11,19 @@ public class ShotgunTurret : MonoBehaviour, ILevelable
     [SerializeField] private float outlineWidth = 0.05f;
     [SerializeField] private int arcSegments = 32;
 
-  
+
     [SerializeField] private GameObject projectilePrefab;
     [SerializeField] private Transform firePoint;
     [SerializeField] private float spreadAngle = 30f;
     [SerializeField] private float fireCooldown = 1.5f;
+    [SerializeField] private float turnSpeed = 5f;
 
 
-    [SerializeField] private SfxSound shootSound = new SfxSound(); 
+    [SerializeField] private SfxSound shootSound = new SfxSound();
 
 
     [SerializeField] private int[] pelletsByLevel = { 5, 6, 9 };
-    [SerializeField] private int[] damageByLevel = { 1, 1, 2 }; 
+    [SerializeField] private int[] damageByLevel = { 1, 1, 2 };
 
     private LineRenderer lineRenderer;
     private float cooldownTimer;
@@ -45,12 +46,14 @@ public class ShotgunTurret : MonoBehaviour, ILevelable
         lineRenderer.startColor = outlineColor;
         lineRenderer.endColor = outlineColor;
 
-        DrawRangeShape(); 
+        DrawRangeShape();
     }
 
     private void Update()
     {
         Transform target = FindNearestCreature();
+        if (target != null) AimAt(target);
+
         bool detected = target != null && Vector3.Distance(transform.position, target.position) <= range;
 
         if (cooldownTimer > 0f) cooldownTimer -= Time.deltaTime;
@@ -60,6 +63,13 @@ public class ShotgunTurret : MonoBehaviour, ILevelable
             FireBlast(target);
             cooldownTimer = fireCooldown;
         }
+    }
+
+    private void AimAt(Transform target)
+    {
+        Vector3 dir = target.position - transform.position;
+        float angle = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
+        transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.Euler(0, angle, 0), Time.deltaTime * turnSpeed);
     }
 
     private Transform FindNearestCreature()
@@ -94,7 +104,7 @@ public class ShotgunTurret : MonoBehaviour, ILevelable
             float angle = -halfSpread + spreadAngle * t;
             Vector3 dir = Quaternion.Euler(0, angle, 0) * baseDir;
 
-            GameObject pellet = Instantiate(projectilePrefab, spawnPos, Quaternion.LookRotation(dir));
+            GameObject pellet = ObjectPool.Get(projectilePrefab, spawnPos, Quaternion.LookRotation(dir));
             Projectile proj = pellet.GetComponent<Projectile>();
             if (proj != null) proj.Launch(dir, damage);
         }

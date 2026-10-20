@@ -1,10 +1,9 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-
 public class CreatureSpawner : MonoBehaviour
 {
-    [SerializeField] private GameObject creaturePrefab; 
+    [SerializeField] private GameObject creaturePrefab;
     [SerializeField] private List<Transform> waypoints = new List<Transform>();
 
     public Creature Spawn(EnemyTypeData type, int coinMin, int coinMax)
@@ -19,8 +18,8 @@ public class CreatureSpawner : MonoBehaviour
         List<Vector3> points = new List<Vector3>();
         foreach (Transform point in waypoints) points.Add(point.position);
 
-        GameObject creatureObj = Instantiate(prefab, points[0], Quaternion.identity);
-        creatureObj.transform.localScale *= type.scale;
+        GameObject creatureObj = ObjectPool.Get(prefab, points[0], Quaternion.identity);
+        creatureObj.transform.localScale = prefab.transform.localScale * type.scale;
 
         Creature creature = creatureObj.GetComponent<Creature>();
         if (creature != null) creature.Initialize(points, type.speed, type.hp, coinMin, coinMax, type.tint);

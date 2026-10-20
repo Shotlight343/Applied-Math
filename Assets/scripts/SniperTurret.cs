@@ -3,32 +3,30 @@ using UnityEngine;
 [RequireComponent(typeof(LineRenderer))]
 public class SniperTurret : MonoBehaviour, ILevelable
 {
-   
+  
     [SerializeField] private string creatureTag = "Creature";
     [SerializeField] private float range = 8f;
 
-   
+  
     [SerializeField] private Color outlineColor = Color.red;
     [SerializeField] private float outlineWidth = 0.05f;
 
-    
+  
     [SerializeField] private float sightAngleTolerance = 2f;
     [SerializeField] private GameObject projectilePrefab;
     [SerializeField] private Transform firePoint;
     [SerializeField] private LayerMask obstacleMask;
 
-  
-    [SerializeField] private SfxSound shootSound = new SfxSound(); 
+    [SerializeField] private SfxSound shootSound = new SfxSound();
 
-   
+
     [SerializeField] private float turnSpeed = 5f;
 
-   
+  
     [SerializeField] private int[] damageByLevel = { 2, 3, 5 };
-    [SerializeField] private float[] reloadByLevel = { 2f, 1.6f, 1f }; 
+    [SerializeField] private float[] reloadByLevel = { 2f, 1.6f, 1f };
 
     private LineRenderer lineRenderer;
-    private bool wasDetected;
     private float reloadTimer;
     private int level = 1;
 
@@ -49,7 +47,7 @@ public class SniperTurret : MonoBehaviour, ILevelable
         lineRenderer.startColor = outlineColor;
         lineRenderer.endColor = outlineColor;
 
-        DrawRangeShape(); 
+        DrawRangeShape();
     }
 
     private void Update()
@@ -62,16 +60,11 @@ public class SniperTurret : MonoBehaviour, ILevelable
 
         if (reloadTimer > 0f) reloadTimer -= Time.deltaTime;
 
-        bool justEntered = detected && !wasDetected;
-        bool canFireAgain = detected && reloadTimer <= 0f;
-
-        if ((justEntered || canFireAgain) && target != null)
+        if (detected && reloadTimer <= 0f)
         {
             Fire(target);
             reloadTimer = CurrentReload;
         }
-
-        wasDetected = detected;
     }
 
     private void AimAt(Transform target)
@@ -120,7 +113,7 @@ public class SniperTurret : MonoBehaviour, ILevelable
         Vector3 spawnPos = firePoint != null ? firePoint.position : transform.position;
         Vector3 direction = (target.position - spawnPos).normalized;
 
-        GameObject bullet = Instantiate(projectilePrefab, spawnPos, Quaternion.LookRotation(direction));
+        GameObject bullet = ObjectPool.Get(projectilePrefab, spawnPos, Quaternion.LookRotation(direction));
         Projectile proj = bullet.GetComponent<Projectile>();
         if (proj != null) proj.Launch(direction, CurrentDamage);
 
