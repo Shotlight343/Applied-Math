@@ -170,7 +170,7 @@ public class TurretUpgrade : MonoBehaviour
         int cost = levelCosts[Level];
         string text = Level == 0
             ? $"Build {turretName} ({cost} coins)"
-            : $"{turretName} Lv{Level} - Upgrade ({cost} coins)";
+            : $"Upgrade ({cost} coins)";
 
   
         GUI.enabled = BankUI.Instance != null && BankUI.Instance.Balance >= cost;

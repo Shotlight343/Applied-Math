@@ -266,6 +266,7 @@ MonoBehaviour:
   firePoint: {fileID: 3254292407059849347}
   spreadAngle: 30
   fireCooldown: 5
+  turnSpeed: 5
   shootSound:
     clip: {fileID: 8300000, guid: 9b97dba3a2c3f5e49a066c2444e29272, type: 3}
     volume: 1
